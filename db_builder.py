@@ -23,7 +23,7 @@ with open("data/peeps.csv", "rb") as csvfile:
     dictReader = csv.DictReader(csvfile)
     for row in dictReader:
         SQLcommands("INSERT INTO peeps VALUES ('" + row["name"] + "', '" + row["age"] + "', '" + row["id"] + "')")
-
+        
 def look_grade(id):
     SQLcommands("SELECT mark FROM courses WHERE courses.id = " + str(id) + ";")
     return cursor.fetchall()
@@ -42,12 +42,20 @@ def count_ids():
     
 def display_student():
     for id in range(1,count_ids()+1):
-        SQLcommands("SELECT name, id FROM courses;")
-        return cursor.fetchall()
+        SQLcommands("SELECT name, id FROM peeps;")
+    for row in cursor.fetchall():
+        print str(row[0]) + "," + str(row[1]) + "," + str(compute_average(row[1]))
 
+def make_peeps_avg():
+    SQLcommands("CREATE TABLE peeps_avg (id INTEGER, average NUMERIC)")
+    SQLcommands("SELECT id FROM peeps;")
+    for row in cursor.fetchall():
+        SQLcommands("INSERT INTO peeps_avg VALUES (%s, %s);" % (row[0], compute_average(row[0])))
+        
 print compute_average(1)
 print count_ids()
-print display_student()
+display_student()
+make_peeps_avg()
 #==========================================================
 db.commit() #save changes
 db.close()  #close database
